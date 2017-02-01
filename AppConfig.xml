@@ -1,0 +1,8 @@
+﻿<Config>
+  <DataPath>C://data.csv</DataPath>
+  <Investor>
+    <Principal>10000</Principal>
+    <WeeklyContribution>125</WeeklyContribution>
+    <DayOfWeek>Monday</DayOfWeek>
+  </Investor>
+</Config>
