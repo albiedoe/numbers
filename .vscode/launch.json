@@ -10,7 +10,7 @@
             "args": [],
             "cwd": "${workspaceRoot}",
             "externalConsole": false,
-            "stopAtEntry": true,
+            "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart"
         },
         {

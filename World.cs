@@ -14,11 +14,11 @@ namespace Algo
         private Config config;
         private Stack<DayInTheMarket> _market = new Stack<DayInTheMarket>();
 
-        public void StartWorld(Config inConfig)
-        {
-            config = inConfig;
-
+        public World(){
             Initialize();
+        }
+
+        public void Process(Run[] runs){
             int count = 0;
             decimal princ, control, actual;
             //princ = control = 1229.030029M;
@@ -46,7 +46,44 @@ namespace Algo
                 if(count % 30 == 0)
                 {
                     int s = 1;
+                   // Debug.WriteLine(actual);
+                }
+                count++;
+            }
+            var c = _market.Last();
+            princ = princ;
+            int next = 1;
+        }
+        public void StartWorld()
+        {
+            int count = 0;
+            decimal princ, control, actual;
+            //princ = control = 1229.030029M;
+            princ = control = 16.66M;
+            actual = 100;
+            foreach (DayInTheMarket day in _market)
+            {
+                decimal multiplier = day.DayChangePercent;
+                decimal timesBigger = actual / princ;
+                princ = (princ * multiplier);
+
+                decimal diff  = day.ClosingPrice - princ;
+                
+
+                princ += diff;
+
+                if(day.DayChangePercent != 1)
+                {
+                    int s = 1;
                     Debug.WriteLine(actual);
+                }
+
+                //actual = actual * multiplier;
+                actual = actual * multiplier + (timesBigger * diff);
+                if(count % 30 == 0)
+                {
+                    int s = 1;
+                   // Debug.WriteLine(actual);
                 }
                 count++;
             }

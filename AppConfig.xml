@@ -1,5 +1,6 @@
 ﻿<Config>
   <DataPath>C://data.csv</DataPath>
+  <RunsFile>Runs.csv</RunsFile>
   <Investor>
     <Principal>10000</Principal>
     <WeeklyContribution>125</WeeklyContribution>

@@ -14,6 +14,8 @@ namespace Algo.Models
         [XmlElement]
         public string DataPath;
         [XmlElement]
+        public string RunsFile;
+        [XmlElement]
         public Investor Investor;
     }
 }
