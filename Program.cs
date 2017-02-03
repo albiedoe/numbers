@@ -17,6 +17,16 @@ namespace Algo
             PrintIntro();
 
             string entry="-1";
+            //debug section
+            Run run = new Run(){
+                Principal = 500,
+                MonthlyContribution  = 100,
+                StartDate = new DateTime(1990, 1, 1)
+            };
+
+            World world = new World();
+            Run[] runs = new Run[] {run};
+            world.Process(runs);
 
             while(entry != "8"){
                 PrintMenu();
@@ -39,7 +49,6 @@ namespace Algo
             Config config = (Config)serializer.Deserialize(reader);
             
             reader.Dispose();
-            world.StartWorld(config);
         }
         private static void PrintIntro()
         {
@@ -49,13 +58,16 @@ We try to find trends in the stock market on continuous contribution plans and t
         }
 
         private static void StartRun(){
-            int principal = RetrieveInt("principal");
-            int monthly = RetrieveInt("Monthly Contribution");
+            decimal principal = RetrienceDecimal("principal");
+            decimal monthly = RetrienceDecimal("Monthly Contribution");
             
             Run run = new Run(){
                 Principal = principal,
                 MonthlyContribution  = monthly
             };
+            World world = new World();
+            Run[] runs = new Run[] {run};
+            world.Process(runs);
 
             Console.WriteLine(run.ToString());
             Console.WriteLine("");
@@ -71,6 +83,19 @@ We try to find trends in the stock market on continuous contribution plans and t
             }
             return tempInt;
         }
+
+
+        private static decimal RetrienceDecimal(string fieldName){
+            Console.WriteLine($"Please enter a value for {fieldName}.");
+            string val = Console.ReadLine();
+            decimal tempDec;
+            while(!decimal.TryParse(val, out tempDec)){
+                Console.WriteLine($"Unable to parse {val} to an int. Please enter a valid value.");
+                val = Console.ReadLine();
+            }
+            return tempDec;
+        }
+
         private static void PrintMenu()
         {
             StringBuilder sb = new StringBuilder();

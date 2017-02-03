@@ -13,47 +13,74 @@ namespace Algo
     {
         private Config config;
         private Stack<DayInTheMarket> _market = new Stack<DayInTheMarket>();
+        private List<DayInTheMarket> _marketList = new List<DayInTheMarket>();
 
-        public World(){
+        private List<Run> ObservingRuns = new List<Run>();
+
+        private decimal marketStart;
+
+        public World()
+        {
             Initialize();
         }
 
-        public void Process(Run[] runs){
-            int count = 0;
-            decimal princ, control, actual;
-            //princ = control = 1229.030029M;
-            princ = control = 16.66M;
-            actual = 100;
-            foreach (DayInTheMarket day in _market)
+        public void Process(Run[] runs)
+        {
+            foreach (Run run in runs)
             {
-                decimal multiplier = day.DayChangePercent;
-                decimal timesBigger = actual / princ;
-                princ = (princ * multiplier);
+                Run control = run.GetControl();
+                List<DayInTheMarket> thisRunsMarket = _marketList.Where(x => x.MarketDate >= run.StartDate && x.MarketDate <= run.EndDate).ToList();
+                marketStart = thisRunsMarket.First().OpenPrice;
+                control.Balance = run.Principal;
+                run.Balance = run.Principal;
 
-                decimal diff  = day.ClosingPrice - princ;
-                
+                ObservingRuns.Add(run);
+                ObservingRuns.Add(control);
+                ContributionManager runManager = new ContributionManager(ContributionManager.ContributionMode.Fridays){
+                    ManagedRun = run
+                };
+                ContributionManager controlManager = new ContributionManager(ContributionManager.ContributionMode.MonthlyAll){
+                    ManagedRun = control
+                };
 
-                princ += diff;
-
-                if(day.DayChangePercent != 1)
+                int count = 0;
+                foreach (DayInTheMarket day in thisRunsMarket)
                 {
-                    int s = 1;
-                    Debug.WriteLine(actual);
+                    runManager.Contribute(day);
+                    controlManager.Contribute(day);
+                    CalculateChange(day);
+                    if (count % 1000 == 0)
+                    {
+                        int s = 1;
+                        Debug.WriteLine(run.Balance + "|" + control.Balance+"|"+marketStart);
+                    }
+                    count++;
                 }
 
-                //actual = actual * multiplier;
-                actual = actual * multiplier + (timesBigger * diff);
-                if(count % 30 == 0)
-                {
-                    int s = 1;
-                   // Debug.WriteLine(actual);
-                }
-                count++;
+                ObservingRuns.Clear();
             }
-            var c = _market.Last();
-            princ = princ;
-            int next = 1;
+            int bp = 1;
         }
+
+        private void CalculateChange(DayInTheMarket day){
+            // decimal multiplier = day.DayChangePercent;
+            // decimal timesBigger = run.Balance / marketStart;
+            // marketStart = (marketStart * multiplier);
+            // decimal diff = day.ClosingPrice - marketStart;
+
+            // marketStart += diff;
+            // run.Balance = run.Balance * multiplier + (timesBigger * diff);
+            decimal multiplier = day.DayChangePercent;
+            decimal newMarketStart = marketStart * multiplier;
+            decimal diff = day.ClosingPrice - newMarketStart;
+            foreach(Run run in ObservingRuns){
+                decimal timesBigger = run.Balance / marketStart;    
+                run.Balance = run.Balance * multiplier + (timesBigger * diff);
+            }
+
+            marketStart = newMarketStart + diff;
+        }
+
         public void StartWorld()
         {
             int count = 0;
@@ -67,12 +94,12 @@ namespace Algo
                 decimal timesBigger = actual / princ;
                 princ = (princ * multiplier);
 
-                decimal diff  = day.ClosingPrice - princ;
-                
+                decimal diff = day.ClosingPrice - princ;
+
 
                 princ += diff;
 
-                if(day.DayChangePercent != 1)
+                if (day.DayChangePercent != 1)
                 {
                     int s = 1;
                     Debug.WriteLine(actual);
@@ -80,10 +107,10 @@ namespace Algo
 
                 //actual = actual * multiplier;
                 actual = actual * multiplier + (timesBigger * diff);
-                if(count % 30 == 0)
+                if (count % 30 == 0)
                 {
                     int s = 1;
-                   // Debug.WriteLine(actual);
+                    // Debug.WriteLine(actual);
                 }
                 count++;
             }
@@ -94,7 +121,7 @@ namespace Algo
 
         private void Initialize()
         {
-            StreamReader reader = new StreamReader( new FileStream("data2.csv", FileMode.Open));
+            StreamReader reader = new StreamReader(new FileStream("data2.csv", FileMode.Open));
             string line = reader.ReadLine();//skip first
 
             while ((line = reader.ReadLine()) != null)
@@ -111,7 +138,9 @@ namespace Algo
                     AdjustedPrice = decimal.Parse(fields[6]),
                 };
                 _market.Push(day);
+                _marketList.Add(day);
             }
+            _marketList = _marketList.OrderBy(day => day.MarketDate).ToList();
         }
     }
 }
