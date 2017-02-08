@@ -11,6 +11,7 @@ namespace Algo.Models
         public DateTime EndDate { get; set; }
         public decimal Balance  { get; set; }
         public decimal FreeCash  { get; set; }
+        public ContributionManager.ContributionMode Mode { get; set; }
         public bool isControl;
         public Run(){
             StartDate = DateTime.MinValue;

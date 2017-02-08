@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using System;
 using System.Diagnostics;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Algo
 {
@@ -18,14 +19,67 @@ namespace Algo
 
             string entry="-1";
             //debug section
-            Run run = new Run(){
+            Run run1 = new Run(){
                 Principal = 500,
                 MonthlyContribution  = 100,
-                StartDate = new DateTime(1990, 1, 1)
+                StartDate = new DateTime(1990, 1, 1),
+                Mode = ContributionManager.ContributionMode.Mondays
             };
+            Run run2 = new Run(){
+                Principal = 500,
+                MonthlyContribution  = 100,
+                StartDate = new DateTime(1990, 1, 1),
+                Mode = ContributionManager.ContributionMode.TuesDays
+            };
+            Run run3 = new Run(){
+                Principal = 500,
+                MonthlyContribution  = 100,
+                StartDate = new DateTime(1990, 1, 1),
+                Mode = ContributionManager.ContributionMode.Wednesdays
+            };
+            Run run4 = new Run(){
+                Principal = 500,
+                MonthlyContribution  = 100,
+                StartDate = new DateTime(1990, 1, 1),
+                Mode = ContributionManager.ContributionMode.Thursdays
+            };
+            Run run5 = new Run(){
+                Principal = 500,
+                MonthlyContribution  = 100,
+                StartDate = new DateTime(1990, 1, 1),
+                Mode = ContributionManager.ContributionMode.Fridays
+            };
+            Run run6 = new Run(){
+                Principal = 500,
+                MonthlyContribution  = 100,
+                StartDate = new DateTime(1990, 1, 1),
+                Mode = ContributionManager.ContributionMode.MonthlyAll
+            };
+            Run run7 = new Run(){
+                Principal = 500,
+                MonthlyContribution  = 100,
+                StartDate = new DateTime(1990, 1, 1),
+                Mode = ContributionManager.ContributionMode.Daily
+            };
+            Run run8 = new Run(){
+                Principal = 500,
+                MonthlyContribution  = 100,
+                StartDate = new DateTime(1990, 1, 1),
+                Mode = ContributionManager.ContributionMode.CalculatedSimpleDayChange
+            };
+            //debug session
 
             World world = new World();
-            Run[] runs = new Run[] {run};
+            List<Run> runs = new List<Run>();
+            runs.Add(run1);
+            runs.Add(run2);
+            runs.Add(run3);
+            runs.Add(run4);
+            runs.Add(run5);
+            runs.Add(run6);
+            runs.Add(run7);
+            runs.Add(run8);
+            
             world.Process(runs);
 
             while(entry != "8"){

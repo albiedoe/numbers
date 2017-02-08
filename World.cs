@@ -14,9 +14,7 @@ namespace Algo
         private Config config;
         private Stack<DayInTheMarket> _market = new Stack<DayInTheMarket>();
         private List<DayInTheMarket> _marketList = new List<DayInTheMarket>();
-
         private List<Run> ObservingRuns = new List<Run>();
-
         private decimal marketStart;
 
         public World()
@@ -24,39 +22,52 @@ namespace Algo
             Initialize();
         }
 
-        public void Process(Run[] runs)
+        public void Process(IEnumerable<Run> runs)
         {
+
             foreach (Run run in runs)
             {
-                Run control = run.GetControl();
+                StringBuilder sb = new StringBuilder($"{run.Mode}:");
+                // Debug.WriteLine($"{run.Mode}:");
+
+                //Run control = run.GetControl();
                 List<DayInTheMarket> thisRunsMarket = _marketList.Where(x => x.MarketDate >= run.StartDate && x.MarketDate <= run.EndDate).ToList();
                 marketStart = thisRunsMarket.First().OpenPrice;
-                control.Balance = run.Principal;
+                //control.Balance = run.Principal;
                 run.Balance = run.Principal;
 
                 ObservingRuns.Add(run);
-                ObservingRuns.Add(control);
-                ContributionManager runManager = new ContributionManager(ContributionManager.ContributionMode.Fridays){
+                //ObservingRuns.Add(control);
+                ContributionManager runManager = new ContributionManager(run.Mode){
                     ManagedRun = run
                 };
-                ContributionManager controlManager = new ContributionManager(ContributionManager.ContributionMode.MonthlyAll){
-                    ManagedRun = control
-                };
+                // ContributionManager controlManager = new ContributionManager(ContributionManager.ContributionMode.MonthlyAll){
+                //     ManagedRun = control
+                // };
 
                 int count = 0;
+                DayInTheMarket lastDay = null;
                 foreach (DayInTheMarket day in thisRunsMarket)
                 {
-                    runManager.Contribute(day);
-                    controlManager.Contribute(day);
+                   // controlManager.Contribute(day);
+                    runManager.Contribute(lastDay);
                     CalculateChange(day);
                     if (count % 1000 == 0)
                     {
                         int s = 1;
-                        Debug.WriteLine(run.Balance + "|" + control.Balance+"|"+marketStart);
+                   //     Debug.WriteLine(run.Balance + "|" + control.Balance+"|"+marketStart);
+                        // Debug.Write($"{run.Balance}|");
+                        sb.Append($"{run.Balance.ToString("#")}|");
                     }
                     count++;
+                    lastDay = day;
                 }
-
+                // Debug.Write($"{run.Balance}");
+                sb.Append($"{run.Balance.ToString("#")}");
+                sb.AppendLine("");
+                sb.AppendLine($"Too much: {runManager.TooMuchFactor}, {runManager.TooMuchFactor/runManager.Total}");
+                sb.AppendLine($"Too little: {runManager.TooLittleFactor}, {runManager.TooLittleFactor/runManager.Total}");
+                Debug.WriteLine(sb.ToString());
                 ObservingRuns.Clear();
             }
             int bp = 1;
